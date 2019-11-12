@@ -1,0 +1,12 @@
+[submodule "extern/xxHash"]
+	path = extern/xxHash
+	url = git@github.com:Cyan4973/xxHash.git
+	branch = master
+[submodule "extern/googletest"]
+	path = extern/googletest
+	url = git@github.com:google/googletest.git
+	branch = release-1.10.0
+[submodule "extern/benchmark"]
+	path = extern/benchmark
+	url = git@github.com:google/benchmark.git
+	branch = master

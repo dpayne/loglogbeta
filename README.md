@@ -1,6 +1,6 @@
 # loglogbeta
 
-A C++ implementation of LogLogBeta cardinality estimation algorithm making usee of AVX-512 intrinsics.
+A C++ implementation of LogLogBeta cardinality estimation algorithm making use of AVX operations.
 
 Original code was ported from a go implementation by seiflotfy, [loglogbeta](https://github.com/seiflotfy/loglogbeta).
 

@@ -6,6 +6,23 @@ Original code was ported from a go implementation by seiflotfy, [loglogbeta](htt
 
 The algorithm comes from a paper by Jason Qin, Denys Kim, Yumei Tung [LogLog-Beta and More: A New Algorithm for Cardinality Estimation Based on LogLog Counting](https://arxiv.org/pdf/1612.02284.pdf).
 
+## Build
+
+    git clone git@github.com:dpayne/loglogbeta.git
+
+    # clone the hashing library xxHash and the testing/benchmark libraries
+    git submodule update --init
+
+    mkdir build
+    cd build
+    cmake ../
+
+    # To enable unit tests use
+    #cmake -DBUILD_PERF_TESTS=ON ../
+
+    make
+
+
 ## Results
 
 #### Error Rate
@@ -74,3 +91,12 @@ The Rust implementation could probably be greatly improved. It is my own version
 * The Java HLL used here did not provide a merge operation so I wrote a simple merge function in Java.
 
 All test were run on skylake CPU running at 4.6 GHz.
+
+### Build Perf Tests
+
+    # To enable perf tests and unit tests use, firstt checkout the libcount library
+    git clone git@github.com:dialtr/libcount.git perf_tests/extern/libcount
+    # Then enable perf tests
+    mkdir -p build && cd build
+    cmake -DBUILD_PERF_TESTS=ON ../
+    make

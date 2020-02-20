@@ -33,7 +33,7 @@ public:
 
 #ifdef __AVX512F__
   uint64_t cardinality() const;
-#elif
+#else
   uint64_t cardinality() const { return cardinality_nonavx(); }
 #endif
 
@@ -41,7 +41,7 @@ public:
 
 #ifdef __AVX512F__
   void merge(const LogLogBeta &merge_me);
-#elif
+#else
   void merge(const LogLogBeta &merge_me) { merge_nonavx(merge_me); }
 #endif
 
@@ -50,7 +50,7 @@ public:
 protected:
 #ifdef __AVX512F__
   void sum_registers(double *sum, uint64_t *zero_count) const;
-#elif
+#else
   void sum_registers(double *sum, uint64_t *zero_count) const {
     sum_registers_nonavx(sum, zero_count);
   }

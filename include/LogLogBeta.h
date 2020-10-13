@@ -5,6 +5,9 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
+#include <limits>
+#include <cmath>
 
 namespace llb {
 namespace constants {
@@ -46,6 +49,97 @@ public:
 #endif
 
   void merge_nonavx(const LogLogBeta &merge_me);
+
+  const int p = 12;
+  const int q = 52;
+  const int m = 1 << p;
+  const double m2alpha = (m / (2. * std::log(2))) * m;
+  const std::vector<double> tauValues = initTau(m);
+  const std::vector<double> sigmaValues = initSigma(m);
+
+  static double sigma(double x, int &numIterations) {
+    numIterations = 0;
+    if (x == 1.)
+      return std::numeric_limits<double>::infinity();
+    double zPrime;
+    double y = 1;
+    double z = x;
+    do {
+      numIterations += 1;
+      x *= x;
+      zPrime = z;
+      z += x * y;
+      y += y;
+    } while (zPrime != z);
+    return z;
+  }
+
+  static double tau(double x, int &numIterations) {
+    numIterations = 0;
+    if (x == 0. || x == 1.)
+      return 0.;
+    double zPrime;
+    double y = 1.0;
+    double z = 1 - x;
+    do {
+      numIterations += 1;
+      x = std::sqrt(x);
+      zPrime = z;
+      y *= 0.5;
+      z -= std::pow(1 - x, 2) * y;
+    } while (zPrime != z);
+    return z / 3;
+  }
+
+  static std::vector<double> initSigma(int m) {
+    int numIterations;
+    std::vector<double> result(m + 1);
+    for (int c = 0; c <= m; ++c) {
+      result[c] = m * sigma(static_cast<double>(c) / static_cast<double>(m),
+                            numIterations);
+    }
+    return result;
+  }
+
+  static std::vector<double> initTau(int m) {
+    int numIterations;
+    std::vector<double> result(m + 1);
+    for (int c = 0; c <= m; ++c) {
+      result[c] = m * tau(static_cast<double>(m - c) / static_cast<double>(m),
+                          numIterations);
+    }
+    return result;
+  }
+
+  double estimate_on_demand(const std::vector<int> &c,
+                            int &numSmallCorrectionIterations,
+                            int &numLargeCorrectionIterations) const {
+
+    numSmallCorrectionIterations = 0;
+    numLargeCorrectionIterations = 0;
+
+    double z =
+        m * tau(static_cast<double>(m - c[q + 1]) / static_cast<double>(m),
+                numLargeCorrectionIterations);
+    for (int k = q; k >= 1; --k) {
+      z += c[k];
+      z *= 0.5;
+    }
+    z += m * sigma(static_cast<double>(c[0]) / static_cast<double>(m),
+                   numSmallCorrectionIterations);
+    return m2alpha / z;
+  }
+
+  double estimate_precalculated(const std::vector<int> &c) const {
+
+    double z = tauValues[c[q + 1]];
+    for (int k = q; k >= 1; --k) {
+      z += c[k];
+      z *= 0.5;
+    }
+    z += sigmaValues[c[0]];
+    return m2alpha / z;
+  }
 
 protected:
 #ifdef __AVX512F__

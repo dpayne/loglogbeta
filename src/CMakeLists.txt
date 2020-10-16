@@ -7,10 +7,12 @@ include_directories(${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/extern/x
 
 list(APPEND PROJECT_HEADERS
     include/LogLogBeta.h
+    include/LogLogErtl.h
 )
 
 list(APPEND PROJECT_SOURCES
     src/LogLogBeta.cpp
+    src/LogLogErtl.cpp
 )
 
 add_project_library("${PROJECT_NAME}_static" "${PROJECT_NAME}" "${PROJECT_HEADERS}" "${PROJECT_SOURCES}" STATIC)

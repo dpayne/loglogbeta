@@ -1,5 +1,5 @@
 option(BUILD_TESTS "Comple and run tests" OFF)
-option(BUILD_PERF_TESTS "Compile and run performance tests" OFF)
+option(BUILD_PERF_TESTS "Compile and run performance tests" ON)
 option(RUN_FORMATTER "Format codebase" OFF)
 option(GENERATE_DOCS "Build documentation" OFF)
 option(RUN_CLANG_TIDY "Run clang tidy on codebase" OFF)

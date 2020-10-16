@@ -6,7 +6,6 @@ endif()
 
 # set cpu arch flags
 set(CPU_FLAGS "-march=native -Ofast")
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fno-omit-frame-pointer -DXXH_STATIC_LINKING_ONLY=1 ${CPU_FLAGS}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -O0 -ggdb -g3")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG -Ofast")

@@ -2,6 +2,7 @@
 #include <functional>
 
 #include "LogLogBeta.h"
+#include "LogLogErtl.h"
 #include "gtest/gtest.h"
 
 int k_string_length = 256;
@@ -27,7 +28,8 @@ TEST(LogLogBeta, AddOne) {
   llb.cardinality();
 }
 
-void add_random_strings(uint64_t count, llb::LogLogBeta *llb) {
+template<typename T>
+void add_random_strings(uint64_t count, T *llb) {
   std::map<std::string, bool> unique_hashes;
   while (unique_hashes.size() < count) {
     unique_hashes[random_string((random() % k_string_length) + 1)] = true;
@@ -111,4 +113,16 @@ TEST(LogLogBetaMerge, Many) {
   ASSERT_TRUE(estimate_error(count * k_merge_count, main.cardinality()) <
               k_error_limit)
       << "cardinality: " << main.cardinality();
+}
+
+TEST(LogLogErtl, EstimateError) {
+  int64_t count = 10;
+  while (count <= 1000000) {
+    llb::LogLogErtl llb{};
+    add_random_strings(count, &llb);
+    std::cout << count << "\t" << llb.cardinality() << "\t" << estimate_error(count, llb.cardinality()) << std::endl;
+    /* ASSERT_TRUE(estimate_error(count, llb.cardinality()) < k_error_limit) */
+    /*     << "cardinality: " << llb.cardinality(); */
+    count *= 10;
+  }
 }

@@ -1,5 +1,6 @@
 #include "xxhash.h"
 #include "LogLogBeta.h"
+#include "LogLogErtl.h"
 #include "PerfHelpers.h"
 #include <benchmark/benchmark.h>
 
@@ -126,11 +127,59 @@ static void MergeNonAvx(benchmark::State &state) {
   }
 }
 
-BENCHMARK(AddString);
+static void AddHashErtl(benchmark::State &state) {
+  const auto count = 10000;
+  llb::LogLogErtl llb;
+  std::vector<uint64_t> hashes;
+  for (auto ix = 0u; ix < count; ++ix) {
+    const auto str = random_string((random() % llb::k_string_length) + 1);
+    hashes.push_back(XXH3_64bits(str.c_str(), str.size()));
+  }
+
+  uint64_t i = 0;
+  for (auto _ : state) {
+    llb.add_hash(hashes[i++]);
+    i = i >= count ? 0 : i + 1;
+  }
+}
+
+static void CardinalityErtl(benchmark::State &state) {
+  const auto count = 10000;
+  llb::LogLogErtl llb;
+  for (auto ix = 0u; ix < count; ++ix) {
+    llb.add(random_string((random() % llb::k_string_length) + 1));
+  }
+
+  for (auto _ : state) {
+    benchmark::DoNotOptimize(llb.cardinality());
+  }
+}
+
+static void FullTestErtl(benchmark::State &state) {
+  const auto count = 100000;
+  std::vector<uint64_t> hashes;
+  for (auto ix = 0u; ix < count; ++ix) {
+    const auto str = random_string((random() % llb::k_string_length) + 1);
+    hashes.push_back(XXH3_64bits(str.data(), str.size()));
+  }
+
+  for (auto _ : state) {
+    llb::LogLogErtl llb;
+    for (const auto hash : hashes) {
+        llb.add_hash(hash);
+    }
+    benchmark::DoNotOptimize(llb.cardinality());
+  }
+}
+
+BENCHMARK(AddHashErtl);
+BENCHMARK(CardinalityErtl);
+BENCHMARK(FullTestErtl);
+/* BENCHMARK(AddString); */
 BENCHMARK(AddHash);
 BENCHMARK(Cardinality);
 BENCHMARK(CardinalityNonAvx);
-BENCHMARK(Merge);
-BENCHMARK(MergeNonAvx);
+/* BENCHMARK(Merge); */
+/* BENCHMARK(MergeNonAvx); */
 BENCHMARK(FullTest);
 BENCHMARK(FullTestNonAvx);
